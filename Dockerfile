@@ -2,17 +2,25 @@ FROM node:20.10.0-alpine AS build
 
 WORKDIR /app
 
-COPY package*.json .
-RUN npm install
+COPY package*.json ./
+COPY ./backend/package*.json ./backend/
+
+RUN npm install --workspaces
 
 COPY . .
+
 RUN npm run build
+RUN npm run -w ./backend build
 
-FROM nginx:1.25.3-alpine-slim AS prod
+FROM node:20.10.0-alpine AS production
 
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY ./docker/nginx.conf /etc/nginx/nginx.conf
+WORKDIR /app
 
-EXPOSE 80
+COPY package*.json ./
+COPY ./backend/package*.json ./backend/
+RUN npm install --omit=dev --workspaces
 
-CMD ["nginx", "-g", "daemon off;"]
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/backend/dist ./backend/dist
+
+CMD ["npm", "start"]
