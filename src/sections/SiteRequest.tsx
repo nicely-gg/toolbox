@@ -1,15 +1,16 @@
 import GenericHeader from '@lib/components/GenericHeader.tsx'
 import { useSection } from '@lib/hooks/scroll-router-context.ts'
 
-export default function About() {
+export default function SiteRequest() {
     const section = useSection()
 
     return (
         <div>
             <GenericHeader
-                title="About"
+                title="Request a Site"
                 titleId={section.hash}
-                description="Nicely Toolbox is a collection of hand-picked websites that are free and useful."
+                description="If you have a site that you think would be a good fit for
+                Toolbox, please send an email."
             />
         </div>
     )

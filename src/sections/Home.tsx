@@ -1,6 +1,9 @@
-import ScrollRouter from '@lib/components/ScrollRouter.tsx'
+import GenericHeader from '@lib/components/GenericHeader.tsx'
+import { useSection } from '@lib/hooks/scroll-router-context.ts'
 
 export default function Home() {
+    const section = useSection()
+
     return (
         <div className="flex flex-col items-center gap-2 text-center">
             <img
@@ -9,14 +12,12 @@ export default function Home() {
                 className="mb-4 w-64"
             />
 
-            <ScrollRouter.Link to="home">
-                <h1 className="mb-2">Nicely Toolbox</h1>
-            </ScrollRouter.Link>
-
-            <p className="text-lg">
-                A collection of hand-picked websites that are{' '}
-                <b className="text-white">free and useful</b>.
-            </p>
+            <GenericHeader
+                title="Nicely Toolbox"
+                titleId={section.hash}
+                titleElement="h1"
+                description="A collection of hand-picked websites that are free and useful."
+            />
         </div>
     )
 }

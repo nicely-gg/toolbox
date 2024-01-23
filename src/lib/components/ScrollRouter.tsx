@@ -3,16 +3,16 @@ import type { ComponentType, ReactNode } from 'react'
 import {
     createContext,
     useCallback,
-    useContext,
     useLayoutEffect,
     useMemo,
     useState,
 } from 'react'
 
+import { useScrollRouter } from '@lib/hooks/scroll-router-context.ts'
 import useScrollY from '../hooks/window-scroll-height.ts'
 
 export type ScrollSection = {
-    id: string
+    hash: string
 
     title?: string
     icon?: ComponentType<{ className?: string }>
@@ -50,13 +50,13 @@ export default function ScrollRouter({ children }: ScrollRouterProps) {
     const registerRoute = useCallback(
         (route: ScrollSection, ref: HTMLElement | null) => {
             // check if the route is already registered to avoid accidental recursion
-            if (ref === null || route.id in routes) {
+            if (ref === null || route.hash in routes) {
                 return
             }
 
             setRoutes(prev => ({
                 ...prev,
-                [route.id]: { ...route, ref },
+                [route.hash]: { ...route, ref },
             }))
         },
         [routes],
@@ -79,12 +79,12 @@ export default function ScrollRouter({ children }: ScrollRouterProps) {
         const newRoute = closestRoutes[0]
 
         // if the route is the same as the current route, do nothing
-        if (!newRoute || newRoute.id === currentRoute) {
+        if (!newRoute || newRoute.hash === currentRoute) {
             return
         }
 
-        window.history.replaceState(null, '', '#' + newRoute.id)
-        setCurrentRoute(newRoute.id)
+        window.history.replaceState(null, '', '#' + newRoute.hash)
+        setCurrentRoute(newRoute.hash)
     }, [currentRoute, routes, scrollY])
 
     const context = useMemo(
@@ -99,23 +99,27 @@ export default function ScrollRouter({ children }: ScrollRouterProps) {
     )
 }
 
-export type ScrollRouteProps = {
+export const SectionContext = createContext<ScrollSection | null>(null)
+
+export type ScrollSectionProps = {
     children?: ReactNode
     section: ScrollSection
 } & JSX.IntrinsicElements['section']
 
-function Section({ children, section, ...restProps }: ScrollRouteProps) {
-    const scrollContext = useContext(ScrollRouterContext)
+function Section({ children, section, ...restProps }: ScrollSectionProps) {
+    const scrollContext = useScrollRouter()
 
     return (
-        <section
-            {...restProps}
-            className="flex flex-col gap-4"
-            ref={ref => scrollContext.registerRoute(section, ref)}
-            id={section.id}
-        >
-            {children}
-        </section>
+        <SectionContext.Provider value={section}>
+            <section
+                {...restProps}
+                className="flex flex-col gap-4"
+                ref={ref => scrollContext.registerRoute(section, ref)}
+                id={section.hash}
+            >
+                {children}
+            </section>
+        </SectionContext.Provider>
     )
 }
 

@@ -1,0 +1,25 @@
+{
+    "name": "@nicely/toolbox-backend",
+    "private": true,
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "type": "module",
+    "scripts": {
+        "start": "node ./dist/index.js",
+        "dev": "nodemon -w ./src -e ts -x \"npm run build && node -r dotenv/config ./dist/index.js\"",
+        "build": "tsc"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "fastify": "^4.25.2",
+        "mongoose": "^8.1.0"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2",
+        "dotenv": "^16.3.2",
+        "nodemon": "^3.0.3",
+        "typescript": "^5.3.3"
+    }
+}

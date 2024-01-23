@@ -2,7 +2,7 @@ import type { ScrollSection } from './ScrollRouter.tsx'
 
 import { LinkIcon } from '@heroicons/react/16/solid'
 
-import ScrollRouter from './ScrollRouter.tsx'
+import GenericHeader from './GenericHeader.tsx'
 
 export type Link = {
     title: string
@@ -22,14 +22,13 @@ export type DrawerProps = {
 export default function ToolboxDrawer({ section }: DrawerProps) {
     return (
         <div>
-            <ScrollRouter.Link to={section.id}>
-                <h3 className="flex items-center gap-2">
-                    {section.icon && <section.icon className="w-12" />}
-                    {section.title}
-                </h3>
-            </ScrollRouter.Link>
-
-            <p className="mb-4 font-thin">{section.description}</p>
+            <GenericHeader
+                icon={section.icon}
+                title={section.title ?? section.hash}
+                titleId={section.hash}
+                description={section.description}
+                className="mb-4"
+            />
 
             <div className="flex flex-col gap-4">
                 {section.links?.map(link => (
@@ -50,22 +49,21 @@ export type DrawerLinkProps = {
 export function DrawerLink({ link }: DrawerLinkProps) {
     return (
         <a
-            className="flex flex-col gap-1 rounded-lg bg-zinc-900 p-8"
+            className="flex flex-col gap-1 rounded-lg bg-zinc-900 p-8 shadow-lg transition duration-300 hover:-translate-y-0.5 hover:shadow-xl"
             href={link.url}
             target="_blank"
             rel="noreferrer"
         >
-            <span className="inline-flex items-center gap-2 text-lg font-bold">
+            <span className="inline-flex items-center gap-2 text-xl font-bold">
                 <img
                     src={`https://s2.googleusercontent.com/s2/favicons?domain_url=${link.url}`}
-                    className="inline w-4"
+                    alt={link.title + ' favicon'}
+                    className="w-4"
                 />
                 {link.title}
-                <LinkIcon
-                    width="24px"
-                    className="inline"
-                />
+                <LinkIcon className="w-6" />
             </span>
+
             <span className="font-thin">{link.description}</span>
         </a>
     )

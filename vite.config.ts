@@ -10,4 +10,14 @@ export default defineConfig({
             '@lib': path.resolve('./src/lib'),
         },
     },
+
+    server: {
+        proxy: {
+            '/api': {
+                target: 'http://localhost:3000',
+                changeOrigin: true,
+                rewrite: path => path.replace(/^\/api/, ''),
+            },
+        },
+    },
 })

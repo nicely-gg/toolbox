@@ -1,10 +1,11 @@
 import type { DrawerSection } from '@lib/components/ToolboxDrawer.tsx'
 
+import { useEffect, useState } from 'react'
+
 import {
     CodeBracketIcon,
     FireIcon,
     PaintBrushIcon,
-    QuestionMarkCircleIcon,
     ShieldCheckIcon,
     SparklesIcon,
 } from '@heroicons/react/16/solid'
@@ -16,13 +17,14 @@ import ToolboxDrawer from '@lib/components/ToolboxDrawer.tsx'
 import About from './sections/About.tsx'
 import Faq from './sections/Faq.tsx'
 import Home from './sections/Home.tsx'
+import SiteRequest from './sections/SiteRequest.tsx'
 
-function App() {
+export default function App() {
     // todo: fakenamegenerator.com, ublock origin, sponsor block, 10 minute mail, boredbutton
     // ! THIS IS TEMPORARY, I WILL BE MOVING THIS TO MONGO
     const sections: DrawerSection[] = [
         {
-            id: 'development_tools',
+            hash: 'development_tools',
             title: 'Development Tools',
             icon: CodeBracketIcon,
             description:
@@ -115,7 +117,7 @@ function App() {
             ],
         },
         {
-            id: 'graphic_design_tools',
+            hash: 'graphic_design_tools',
             title: 'Graphic and Design Tools',
             description:
                 'Tools for creating, editing, and managing graphics and designs.',
@@ -167,7 +169,7 @@ function App() {
             ],
         },
         {
-            id: 'privacy_security_tools',
+            hash: 'privacy_security_tools',
             title: 'Privacy and Security Tools',
             description:
                 'Tools and resources for enhancing privacy and security.',
@@ -187,7 +189,7 @@ function App() {
             ],
         },
         {
-            id: 'cool',
+            hash: 'cool',
             title: 'Fun Tools',
             description: 'Fun and interesting tools and resources.',
             icon: FireIcon,
@@ -213,55 +215,79 @@ function App() {
 
     return (
         <ScrollRouter>
-            <div className="flex min-h-dvh gap-8">
-                <Sidebar />
+            <Sidebar />
 
-                <main className="mx-auto flex max-w-4xl flex-col gap-32 px-4 py-24 sm:px-8">
-                    <ScrollRouter.Section
-                        section={{
-                            title: 'Home',
-                            id: 'home',
-                            icon: SparklesIcon,
-                        }}
-                    >
-                        <Home />
-                    </ScrollRouter.Section>
+            <main className="mx-auto flex max-w-4xl flex-col gap-32 px-4 py-24 sm:px-8">
+                <ScrollRouter.Section
+                    section={{
+                        title: 'Home',
+                        hash: 'home',
+                        icon: SparklesIcon,
+                    }}
+                >
+                    <Home />
+                </ScrollRouter.Section>
 
-                    {sections.map(section => (
-                        <ScrollRouter.Section
-                            key={section.id}
-                            section={section}
-                        >
-                            <ToolboxDrawer section={section} />
-                        </ScrollRouter.Section>
-                    ))}
+                <DrawerRouterSections />
 
-                    <ScrollRouter.Section
-                        section={{
-                            id: 'faq',
-                            title: 'faq',
-                            icon: QuestionMarkCircleIcon,
-                            appearance: 'sidebar-alt',
-                        }}
-                    >
-                        <Faq />
-                    </ScrollRouter.Section>
+                <ScrollRouter.Section
+                    section={{
+                        hash: 'site_request',
+                        title: 'submissions',
+                        appearance: 'sidebar-alt',
+                    }}
+                >
+                    <SiteRequest />
+                </ScrollRouter.Section>
 
-                    <ScrollRouter.Section
-                        section={{
-                            id: 'about',
-                            title: 'about',
-                            appearance: 'sidebar-alt',
-                        }}
-                    >
-                        <About />
-                    </ScrollRouter.Section>
-                </main>
-            </div>
+                <ScrollRouter.Section
+                    section={{
+                        hash: 'faq',
+                        title: 'faq',
+                        appearance: 'sidebar-alt',
+                    }}
+                >
+                    <Faq />
+                </ScrollRouter.Section>
+
+                <ScrollRouter.Section
+                    section={{
+                        hash: 'about',
+                        title: 'about',
+                        appearance: 'sidebar-alt',
+                    }}
+                >
+                    <About />
+                </ScrollRouter.Section>
+            </main>
 
             <Footer />
         </ScrollRouter>
     )
 }
 
-export default App
+function DrawerRouterSections() {
+    const [sections, setSections] = useState<DrawerSection[]>([])
+
+    useEffect(() => {
+        const controller = new AbortController()
+
+        fetch('/api/drawers', { signal: controller.signal })
+            .then(r => r.json())
+            .then(setSections)
+            .catch(err => {
+                console.error('Failed to fetch drawer sections:', err)
+            })
+
+        return () => controller.abort()
+    }, [])
+
+    return sections.map(section => (
+        <ScrollRouter.Section
+            key={section.hash}
+            section={section}
+        >
+            <ToolboxDrawer section={section} />
+        </ScrollRouter.Section>
+    ))
+}
