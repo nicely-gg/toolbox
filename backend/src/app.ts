@@ -15,7 +15,7 @@ export function createApp() {
         })
     }
 
-    app.get('/api/drawers', () => ToolboxDrawer.find().exec())
+    app.get('/api/drawers', () => ToolboxDrawer.find().lean().exec())
 
     app.addHook('onReady', async () => {
         try {
